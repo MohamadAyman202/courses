@@ -10,7 +10,7 @@ class Course extends Model
     use HasFactory;
     protected $guarded = [];
 
-    public function course_detials(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function lessons(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Lesson::class);
     }

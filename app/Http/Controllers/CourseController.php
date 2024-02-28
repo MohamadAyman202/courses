@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CourseController extends Controller
 {
@@ -26,18 +27,26 @@ class CourseController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @throws ValidationException
      */
     public function store(Request $request)
     {
         $this->validate($request, [
-           "course_name" => ['required', 'string'],
+            "course_name" => ['required', 'string'],
             'meta_description' => ['required', 'max:80', 'string'],
-            'description' => ['required']
+            'description' => ['required'],
+            'photo' => ['required', 'mimes:jpg,svg,jpeg,png,gif']
         ]);
+
         try {
-            $data = $request->except('_token');
+            $data = $request->except('_token', 'photo');
             $data['slug'] = str()->slug($data['course_name']);
             $data['teacher_id'] = auth()->user()->id;
+
+            if ($request->hasFile('photo')) {
+                $image_name = time() . '.' . $request->file('photo')->extension();
+                $data['photo'] = "uploads/course/$image_name";
+            }
 
             $course = Course::query()->where('slug', $data['slug']);
             if ($course->count() > 1) {
@@ -47,12 +56,13 @@ class CourseController extends Controller
             $status = Course::query()->create($data);
 
             if ($status) {
+                $request->file('photo')->move(public_path("uploads/course/"), $image_name);
                 session()->flash('success', 'Successfully Created Course');
             } else {
                 session()->flash('error', 'Not Successfully Created Course');
             }
             return redirect()->route('teacher.courses.index');
-        }catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return redirect()->back()->withErrors(['error' => $ex->getMessage()]);
         }
     }
@@ -81,12 +91,18 @@ class CourseController extends Controller
         $this->validate($request, [
             "course_name" => ['required', 'string'],
             'meta_description' => ['required', 'max:80', 'string'],
-            'description' => ['required']
+            'description' => ['required'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,svg,jpeg,png']
         ]);
         try {
-            $data = $request->except('_token');
+            $data = $request->except('_token', 'photo');
             $data['slug'] = str()->slug($data['course_name']);
             $data['teacher_id'] = auth()->user()->id;
+
+            if ($request->hasFile('photo')) {
+                $image_name = time() . '.' . $request->file('photo')->extension();
+                $data['photo'] = "uploads/course/$image_name";
+            }
 
             $course = Course::query()->where('slug', $slug);
             if ($course->count() > 1) {
@@ -96,13 +112,15 @@ class CourseController extends Controller
             $status = $course->first()->fill($data)->save();
 
             if ($status) {
+                if ($request->hasFile('photo')) {
+                    $request->file('photo')->move(public_path("uploads/course/"), $image_name);
+                }
                 session()->flash('success', 'Successfully Updated Course');
             } else {
                 session()->flash('error', 'Not Successfully Updated Course');
             }
             return redirect()->route('teacher.courses.index');
-
-        }catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return redirect()->back()->withErrors(['error' => $ex->getMessage()]);
         }
     }
@@ -124,6 +142,4 @@ class CourseController extends Controller
             return redirect()->route('teacher.courses.index');
         }
     }
-
-
 }

@@ -17,7 +17,6 @@ class TeacherSeeder extends Seeder
         Teacher::query()->create([
            'name' => 'Mohamad',
            'email' => 'mohamad@gmail.com',
-           'age' => '21',
            'phone' => '01007363331',
            'password' => Hash::make('3291673465'),
             'address' => 'sadat city'
