@@ -21,7 +21,7 @@ Route::middleware('guest:teacher')->group(function () {
 
 
 Route::middleware('auth:teacher')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Teacher\DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/', [\App\Http\Controllers\Teacher\DashboardController::class, 'dashboard'])->name('dashboard');s
     Route::resource('courses', \App\Http\Controllers\CourseController::class);
     Route::resource('lessons', \App\Http\Controllers\LessonController::class);
 });
