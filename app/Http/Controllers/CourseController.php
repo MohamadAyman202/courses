@@ -13,7 +13,7 @@ class CourseController extends Controller
      */
     public function index()
     {
-        $courses = Course::query()->orderBy('created_at', 'DESC')->get();
+        $courses = Course::query()->orderBy('created_at', 'DESC')->paginate(PAGINATE_COUNT);
         return view('backend.pages.courses.index', compact('courses'));
     }
 
@@ -49,7 +49,7 @@ class CourseController extends Controller
             }
 
             $course = Course::query()->where('slug', $data['slug']);
-            if ($course->count() > 1) {
+            if ($course->count() == 0) {
                 $data['slug'] = $data['slug'] . '-' . time();
             }
 
@@ -99,13 +99,15 @@ class CourseController extends Controller
             $data['slug'] = str()->slug($data['course_name']);
             $data['teacher_id'] = auth()->user()->id;
 
+            $course = Course::query()->where('slug', $slug);
+
             if ($request->hasFile('photo')) {
+                unlink($course->first()->photo);
                 $image_name = time() . '.' . $request->file('photo')->extension();
                 $data['photo'] = "uploads/course/$image_name";
             }
 
-            $course = Course::query()->where('slug', $slug);
-            if ($course->count() > 1) {
+            if ($course->count() != 0) {
                 $data['slug'] = $data['slug'] . '-' . time();
             }
 
@@ -130,16 +132,16 @@ class CourseController extends Controller
      */
     public function destroy($slug)
     {
-        $course = Course::query()->where('slug', $slug);
+        $course = Course::query()->where('slug', $slug)->first();
         if ($course) {
+            unlink($course->photo);
             $status = $course->delete();
-
             if ($status) {
                 session()->flash('success', 'Successfully Deleted Course');
             } else {
                 session()->flash('error', 'Not Successfully Deleted Course');
             }
-            return redirect()->route('teacher.courses.index');
         }
+        return redirect()->route('teacher.courses.index');
     }
 }

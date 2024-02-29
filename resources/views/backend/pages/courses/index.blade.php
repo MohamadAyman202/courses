@@ -21,14 +21,15 @@
 @section('content')
     <!-- row opened -->
     <div class="p-5 ">
+        @include('backend.layouts.message')
         <a class="modal-effect btn btn-primary btn-md" data-effect="effect-just-me" data-toggle="modal"
             href="#modaldemo8">Create Courses</a>
         <a href="#" class="btn btn-warning btn-md">Archive Courses</a>
     </div>
 
-    <div class="d-flex flex-wrap">
         @isset($courses)
-            @foreach ($courses as $key => $course)
+            <div class="d-flex flex-wrap">
+                @foreach ($courses as $key => $course)
                 <div class="card mr-5" style="width: 19rem;">
                     <img class="card-img-top" src="{{ asset($course->photo) }}" alt="Card image cap">
                     <div class="card-body">
@@ -161,8 +162,11 @@
                 </div>
                 <!-- End Modal Delete-->
             @endforeach
+            </div>
+            <div class="d-flex justify-content-center align-items-center">
+                {!! $courses->links() !!}
+            </div>
         @endisset
-    </div>
 
     <!-- Modal Create -->
     <div class="modal" id="modaldemo8">
@@ -229,7 +233,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn ripple btn-primary" type="submit">Save changes</button>
+                        <button class="btn ripple btn-primary" type="submit">Submit</button>
                         <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">Close</button>
                     </div>
                 </form>

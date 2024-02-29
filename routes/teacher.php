@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+define('PAGINATE_COUNT', 50);
 Route::middleware('guest:teacher')->group(function () {
    Route::get('/login', [\App\Http\Controllers\Teacher\Auth\LoginController::class, 'get_login'])->name('login');
     Route::post('/logins', [\App\Http\Controllers\Teacher\Auth\LoginController::class, 'login'])->name('login');
@@ -22,4 +23,5 @@ Route::middleware('guest:teacher')->group(function () {
 Route::middleware('auth:teacher')->group(function () {
     Route::get('/', [\App\Http\Controllers\Teacher\DashboardController::class, 'dashboard'])->name('dashvoard');
     Route::resource('courses', \App\Http\Controllers\CourseController::class);
+    Route::resource('lessons', \App\Http\Controllers\LessonController::class);
 });
