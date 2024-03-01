@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
@@ -23,6 +25,9 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $courses = Cache::remember("courses", 600, function () {
+            return Course::query()->orderBy('created_at', 'DESC')->paginate(PAGINATE_COUNT);
+        });
+        return view('frontend.home', compact('courses'));
     }
 }
