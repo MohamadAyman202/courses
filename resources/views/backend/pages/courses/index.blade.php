@@ -20,16 +20,17 @@
 @endsection
 @section('content')
     <!-- row opened -->
-    <div class="p-5 ">
-        @include('backend.layouts.message')
-        <a class="modal-effect btn btn-primary btn-md" data-effect="effect-just-me" data-toggle="modal"
-            href="#modaldemo8">Create Courses</a>
-        <a href="#" class="btn btn-warning btn-md">Archive Courses</a>
+    <div class="card card-body mt-3">
+        <div class="">
+            @include('backend.layouts.message')
+            <a class="modal-effect btn btn-primary btn-md" data-effect="effect-just-me" data-toggle="modal"
+                href="#modaldemo8">Create Courses</a>
+            <a href="#" class="btn btn-warning btn-md">Archive Courses</a>
+        </div>
     </div>
-
-        @isset($courses)
-            <div class="d-flex flex-wrap">
-                @foreach ($courses as $key => $course)
+    @isset($courses)
+        <div class="d-flex flex-wrap">
+            @foreach ($courses as $key => $course)
                 <div class="card mr-5" style="width: 19rem;">
                     <img class="card-img-top" src="{{ asset($course->photo) }}" alt="Card image cap">
                     <div class="card-body">
@@ -39,12 +40,18 @@
                         <span
                             class="d-block p-2 mb-2 btn btn-{{ $course->status == 'active' ? 'primary' : 'danger' }} btn-sm">{{ ucfirst($course->status) }}</span>
                         <div class="text-center">
+                            <div class="row">
 
-                            <a class="modal-effect btn btn-primary btn-md" data-effect="effect-just-me" data-toggle="modal"
-                                href="#edit{{ $course->slug }}">Edit</a>
-                            <a class="modal-effect btn btn-danger btn-md" data-effect="effect-just-me" data-toggle="modal"
-                                href="#delete{{ $course->slug }}">Delete</a>
-                            <a href="#" class="btn btn-warning btn-md">Approved</a>
+                                <div class="col-6">
+                                    <a class="modal-effect btn btn-primary btn-block" data-effect="effect-just-me"
+                                        data-toggle="modal" href="#edit{{ $course->slug }}">Edit</a>
+                                </div>
+                                <div class="col-6">
+                                    <a class="modal-effect btn btn-danger btn-block" data-effect="effect-just-me"
+                                        data-toggle="modal" href="#delete{{ $course->slug }}">Delete</a>
+                                </div>
+                            </div>
+                            {{-- <a href="#" class="btn btn-warning btn-md">Approved</a> --}}
                         </div>
 
                     </div>
@@ -57,7 +64,7 @@
                                 <h6 class="modal-title">Edit Course</h6><button aria-label="Close" class="close"
                                     data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                             </div>
-                            <form action="{{ route('teacher.courses.update', $course->slug) }}" method="post"
+                            <form action="{{ route('admin.courses.update', $course->slug) }}" method="post"
                                 enctype="multipart/form-data">
                                 @csrf
                                 @method('PATCH')
@@ -76,19 +83,6 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="" class="form-label">Meta Description
-                                            <span class="text-danger">*</span></label>
-                                        <input type="text" name="meta_description" id="" maxlength="80"
-                                            value="{{ $course->meta_description }}"
-                                            class="form-control @error('meta_description') is-invalid
-                                                                    @enderror"
-                                            placeholder="" aria-describedby="helpId" />
-                                        @error('meta_description')
-                                            <small id="helpId" class="text-danger">{{ $message }}</small>
-                                        @enderror
-                                    </div>
-
-                                    <div class="mb-3">
                                         <label for="" class="form-label">Upload Photo <span
                                                 class="text-danger">*</span></label>
                                         <input type="file" name="photo" id=""
@@ -101,19 +95,16 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="" class="form-label">Meta Description
-                                            <span class="text-danger">*</span></label>
-                                        <textarea id="editor{{ $key }}"
-                                            class="form-control @error('description') is-invalid
-                                                                @enderror"
-                                            col="8" name="description">{{ $course->description }}</textarea>
-                                        @error('description')
-                                            <small id="helpId" class="text-danger">{{ $message }}</small>
-                                        @enderror
+                                        <label for="" class="form-label">Price</label>
+                                        <input type="number" min="0" value="{{ $course->price }}" name="price"
+                                            id="" class="form-control" placeholder="" aria-describedby="helpId" />
+                                        {{-- <small id="helpId" class="text-muted">Help text</small> --}}
                                     </div>
+
                                     <div class="mt-3">
                                         <select class="form-control" name="status">
-                                            <option value="active" {{ $course->status == 'active' ? 'selected' : '' }}>Active
+                                            <option value="active" {{ $course->status == 'active' ? 'selected' : '' }}>
+                                                Active
                                             </option>
                                             <option value="inactive" {{ $course->status == 'inactive' ? 'selected' : '' }}>
                                                 Inactive</option>
@@ -141,7 +132,7 @@
                                 <h6 class="modal-title">Delete Course</h6><button aria-label="Close" class="close"
                                     data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                             </div>
-                            <form action="{{ route('teacher.courses.destroy', $course->slug) }}" method="post">
+                            <form action="{{ route('admin.courses.destroy', $course->slug) }}" method="post">
                                 @csrf
                                 @method('delete')
                                 <div class="modal-body">
@@ -162,11 +153,11 @@
                 </div>
                 <!-- End Modal Delete-->
             @endforeach
-            </div>
-            <div class="d-flex justify-content-center align-items-center">
-                {!! $courses->links() !!}
-            </div>
-        @endisset
+        </div>
+        <div class="d-flex justify-content-center align-items-center">
+            {!! $courses->links() !!}
+        </div>
+    @endisset
 
     <!-- Modal Create -->
     <div class="modal" id="modaldemo8">
@@ -176,7 +167,7 @@
                     <h6 class="modal-title">Create Course</h6><button aria-label="Close" class="close"
                         data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                 </div>
-                <form action="{{ route('teacher.courses.store') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('admin.courses.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
@@ -192,18 +183,6 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="" class="form-label">Meta Description <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" name="meta_description" id="" maxlength="80"
-                                class="form-control @error('meta_description') is-invalid
-                            @enderror"
-                                placeholder="" aria-describedby="helpId" />
-                            @error('meta_description')
-                                <small id="helpId" class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
                             <label for="" class="form-label">Upload Photo <span
                                     class="text-danger">*</span></label>
                             <input type="file" name="photo" id=""
@@ -214,17 +193,13 @@
                                 <small id="helpId" class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-
                         <div class="mb-3">
-                            <label for="" class="form-label">Meta Description <span
-                                    class="text-danger">*</span></label>
-                            <textarea id="editor" class="form-control @error('description') is-invalid
-                            @enderror"
-                                col="8" name="description"></textarea>
-                            @error('description')
-                                <small id="helpId" class="text-danger">{{ $message }}</small>
-                            @enderror
+                            <label for="" class="form-label">Price</label>
+                            <input type="number" min="0" value="100" name="price" id=""
+                                class="form-control" placeholder="" aria-describedby="helpId" />
+                            {{-- <small id="helpId" class="text-muted">Help text</small> --}}
                         </div>
+
                         <div class="mt-3">
                             <select class="form-control" name="status">
                                 <option value="active" selected>Active</option>
@@ -241,6 +216,7 @@
             </div>
         </div>
     </div>
+
     <!-- End Modal Create-->
 @endsection
 @section('js')

@@ -8,6 +8,12 @@ use Illuminate\Validation\ValidationException;
 
 class CourseController extends Controller
 {
+
+    private $var;
+    public function __construct()
+    {
+        // 
+    }
     /**
      * Display a listing of the resource.
      */
@@ -33,15 +39,13 @@ class CourseController extends Controller
     {
         $this->validate($request, [
             "course_name" => ['required', 'string'],
-            'meta_description' => ['required', 'max:80', 'string'],
-            'description' => ['required'],
             'photo' => ['required', 'mimes:jpg,svg,jpeg,png,gif']
         ]);
 
         try {
             $data = $request->except('_token', 'photo');
             $data['slug'] = str()->slug($data['course_name']);
-            $data['teacher_id'] = auth()->user()->id;
+            $data['admin_id'] = auth()->user()->id;
 
             if ($request->hasFile('photo')) {
                 $image_name = time() . '.' . $request->file('photo')->extension();
@@ -61,7 +65,7 @@ class CourseController extends Controller
             } else {
                 session()->flash('error', 'Not Successfully Created Course');
             }
-            return redirect()->route('teacher.courses.index');
+            return redirect()->route('admin.courses.index');
         } catch (\Exception $ex) {
             return redirect()->back()->withErrors(['error' => $ex->getMessage()]);
         }
@@ -90,14 +94,12 @@ class CourseController extends Controller
     {
         $this->validate($request, [
             "course_name" => ['required', 'string'],
-            'meta_description' => ['required', 'max:80', 'string'],
-            'description' => ['required'],
             'photo' => ['nullable', 'image', 'mimes:jpg,svg,jpeg,png']
         ]);
         try {
             $data = $request->except('_token', 'photo');
             $data['slug'] = str()->slug($data['course_name']);
-            $data['teacher_id'] = auth()->user()->id;
+            $data['admin_id'] = auth()->user()->id;
 
             $course = Course::query()->where('slug', $slug);
 
@@ -121,7 +123,7 @@ class CourseController extends Controller
             } else {
                 session()->flash('error', 'Not Successfully Updated Course');
             }
-            return redirect()->route('teacher.courses.index');
+            return redirect()->route('admin.courses.index');
         } catch (\Exception $ex) {
             return redirect()->back()->withErrors(['error' => $ex->getMessage()]);
         }
@@ -142,6 +144,6 @@ class CourseController extends Controller
                 session()->flash('error', 'Not Successfully Deleted Course');
             }
         }
-        return redirect()->route('teacher.courses.index');
+        return redirect()->route('admin.courses.index');
     }
 }
