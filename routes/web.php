@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PaymentController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,3 +22,10 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/pay', [PaymentController::class, 'pay'])->name('pay');
+Route::post('/pay/callback', [PaymentController::class, 'callback'])->name('callback');
+
+Route::get('logout', function () {
+    Auth::guard('web')->logout();
+    return back();
+});

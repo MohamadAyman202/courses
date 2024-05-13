@@ -27,15 +27,16 @@
                                         <div class="main-signup-header">
                                             <h2>Welcome back!</h2>
                                             <h5 class="font-weight-semibold mb-4">Please sign in to continue.</h5>
-                                            @if(Session::has('error'))
+                                            @if (Session::has('error'))
                                                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                                     <strong>Error!</strong> {{ Session::get('error') }}
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <button type="button" class="close" data-dismiss="alert"
+                                                        aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
                                                     </button>
                                                 </div>
                                             @endif
-                                            <form action="{{ route('teacher.login') }}" method="post">
+                                            <form action="{{ route('admin.login') }}" method="post">
                                                 @csrf
                                                 <div class="form-group">
                                                     <label>Email</label> <input class="form-control"

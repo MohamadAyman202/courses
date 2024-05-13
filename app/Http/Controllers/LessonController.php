@@ -12,7 +12,7 @@ class LessonController extends Controller
      */
     public function index()
     {
-        $data['lessons'] = Lesson::query()->orderBy('created_at','DESC')->paginate(PAGINATE_COUNT);
+        $data['lessons'] = Lesson::orderBy('created_at', 'DESC')->paginate(PAGINATE_COUNT);
         $data['courses'] = auth()->user()->courses;
         return view('backend.pages.lessons.index', compact('data'));
     }
@@ -37,7 +37,7 @@ class LessonController extends Controller
             'title' => ['required', 'string'],
             'course_video' => ['required', 'mimes:mp4,ogx,oga,ogv,ogg,webm', 'max:20000'],
             'time_video' => ['required', "regex:$regex"],
-            'course_id'=> ['required']
+            'course_id' => ['required']
         ], $message);
 
         try {
@@ -49,12 +49,12 @@ class LessonController extends Controller
                 $data['course_video'] = "uploads/videos/$video_name";
             }
 
-            $count_slug = Lesson::query()->where('slug', $data['slug'])->count();
+            $count_slug = Lesson::where('slug', $data['slug'])->count();
             if ($count_slug == 0) {
                 $data['slug'] = $data['slug'] . '-' . time();
             }
 
-            $status = Lesson::query()->create($data);
+            $status = Lesson::create($data);
 
             if ($status) {
                 $request->file('course_video')->move(public_path("uploads/videos/"), $video_name);
@@ -63,7 +63,7 @@ class LessonController extends Controller
                 session()->flash('error', 'Not Successfully Created Lesson');
             }
 
-            return redirect()->route('teacher.lessons.index');
+            return redirect()->route('admin.lessons.index');
         } catch (\Exception $ex) {
             return redirect()->back()->withErrors(['error' => $ex->getMessage()]);
         }
@@ -97,14 +97,14 @@ class LessonController extends Controller
             'title' => ['required', 'string'],
             'course_video' => ['nullable', 'mimes:mp4,ogx,oga,ogv,ogg,webm', 'max:20000'],
             'time_video' => ['required', "regex:$regex"],
-            'course_id'=> ['required']
+            'course_id' => ['required']
         ], $message);
 
         try {
             $data = $request->except('_token', 'course_video');
             $data['slug'] = str()->slug($data['title']);
 
-            $lesson = Lesson::query()->where('slug', $slug);
+            $lesson = Lesson::where('slug', $slug);
             if ($request->hasFile('course_video')) {
                 unlink($lesson->first()->course_video);
                 $video_name = time() . '.' . $request->file('course_video')->extension();
@@ -126,7 +126,7 @@ class LessonController extends Controller
                 session()->flash('error', 'Not Successfully Created Lesson');
             }
 
-            return redirect()->route('teacher.lessons.index');
+            return redirect()->route('admin.lessons.index');
         } catch (\Exception $ex) {
             return redirect()->back()->withErrors(['error' => $ex->getMessage()]);
         }
@@ -137,7 +137,7 @@ class LessonController extends Controller
      */
     public function destroy($slug)
     {
-        $lesson = Lesson::query()->where('slug', $slug)->first();
+        $lesson = Lesson::where('slug', $slug)->first();
 
         if ($lesson) {
             unlink($lesson->course_video);

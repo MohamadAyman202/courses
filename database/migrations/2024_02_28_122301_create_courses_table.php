@@ -15,11 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('course_name');
             $table->string('slug')->unique();
-            $table->text('meta_description');
             $table->string('photo');
-            $table->longText('description');
+            $table->integer('price')->default(100);
             $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->foreignId('teacher_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('admin_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }
