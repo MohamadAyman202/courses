@@ -44,20 +44,20 @@ class QuizeController extends Controller
     {
         try {
             // Find the quiz by ID
-            $quiz = quize::findOrFail($id);
-            // Update quiz data
-            $quiz->name = $request['name'];
-            $quiz->lesson_id = $request['lesson_id'];
-            $quiz->status = $request['status'];
-            $quiz->end_time = $request['end_time'];
-            $quiz->again_quize = $request['again_quize'];
-            $quiz->score = $request['score'];
-            $quiz->save();
+            $quiz = Quize::findOrFail($id);
+
+            // Extracting and updating quiz data using the data() method
+            $data = $this->data($request);
+            $quiz->update($data);
+
             return redirect()->route('quize.index')->with('success', 'Quiz updated successfully');
         } catch (\Exception $ex) {
             return redirect()->back()->withErrors(['error' => $ex->getMessage()]);
         }
     }
+
+
+
     public function destroy($slug)
     {
         $quize = quize::query()->where('slug', $slug)->first();
