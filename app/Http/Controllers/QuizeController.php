@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreQuizeRequest;
 use App\Models\Lesson;
 use App\Models\quize;
 use Illuminate\Http\Request;
@@ -39,28 +40,18 @@ class QuizeController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(StoreQuizeRequest $request, $id)
     {
-        // Validate the incoming request
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'lesson_id' => 'required|exists:lessons,id',
-            'status' => 'required|in:active,inactive',
-            'end_time' => 'required|date_format:H:i',
-            'again_quize' => 'required|boolean',
-            'score' => 'required|numeric',
-        ]);
-
         try {
             // Find the quiz by ID
             $quiz = quize::findOrFail($id);
             // Update quiz data
-            $quiz->name = $validatedData['name'];
-            $quiz->lesson_id = $validatedData['lesson_id'];
-            $quiz->status = $validatedData['status'];
-            $quiz->end_time = $validatedData['end_time'];
-            $quiz->again_quize = $validatedData['again_quize'];
-            $quiz->score = $validatedData['score'];
+            $quiz->name = $request['name'];
+            $quiz->lesson_id = $request['lesson_id'];
+            $quiz->status = $request['status'];
+            $quiz->end_time = $request['end_time'];
+            $quiz->again_quize = $request['again_quize'];
+            $quiz->score = $request['score'];
             $quiz->save();
             return redirect()->route('quize.index')->with('success', 'Quiz updated successfully');
         } catch (\Exception $ex) {

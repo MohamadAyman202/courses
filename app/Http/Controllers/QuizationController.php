@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreQuizationRequest;
 use App\Models\quization;
 use App\Models\quize;
 use Illuminate\Http\Request;
@@ -16,26 +17,22 @@ class QuizationController extends Controller
         return view('backend.pages.quization.index', compact('data','quizePluck'));
     }
 
-    public function store(Request $request){
-        // Validate the incoming request
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'quize_id' => 'required',
-        ]);
+    public function store(StoreQuizationRequest $request){
+
 
        try {
         // Generate slug from the name
-        $slug = Str::slug($validatedData['name']);
+        $slug = Str::slug($request['name']);
 
         // Check if the slug already exists and make it unique if necessary
         $suffix = 2;
         while (quize::where('slug', $slug)->exists()) {
-            $slug = Str::slug($validatedData['name'] . '-' . $suffix++);
+            $slug = Str::slug($request['name'] . '-' . $suffix++);
         }
         // Create a new quiz instance
         $quization = new quization();
-        $quization->name = $validatedData['name'];
-        $quization->quize_id = $validatedData['quize_id'];
+        $quization->name = $request['name'];
+        $quization->quize_id = $request['quize_id'];
         $quization->slug = $slug; // Set the slug
         $quization->save();
 
@@ -46,20 +43,11 @@ class QuizationController extends Controller
 
     }
 
-    public function update( Request $request ,$id){
-
-$validatedData=$request->validate([
-
-    'name' => 'required|string',
-    'quize_id' =>'required',
-
-]);
-
-
+    public function update( StoreQuizationRequest $request ,$id){
 try {
     $quization=quization::findOrFail($id);
-    $quization->name = $validatedData['name'];
-    $quization->quize_id = $validatedData['quize_id'];
+    $quization->name = $request['name'];
+    $quization->quize_id = $request['quize_id'];
     $quization->save();
     return redirect()->route('quization.index')->with('success', 'quization updated successfully');
 
